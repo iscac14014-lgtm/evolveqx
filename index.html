@@ -1403,6 +1403,32 @@
                 width: 100%;
                 justify-content: center;
             }
+
+
+            .hero-overlay-centered .hero-title {
+                font-size: clamp(1.75rem, 8vw, 2.8rem);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .hero-description {
+                left: 5%;
+                right: 5%;
+                bottom: 18px;
+                padding: 12px 16px;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            .hero-overlay-centered .hero-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-height: 800px) {
+            .hero-description-box {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -1428,10 +1454,16 @@
     </header>
 
     <section class="hero" id="home" aria-label="Hero image">
-        <div class="hero-content">
-            <h1 class="sr-only">Evolve QX - Software Testing & Quality Assurance</h1>
+        <div class="hero-text-wrapper">
+            <div class="hero-content">
+                <h1 class="sr-only">Evolve QX - Software Testing & Quality Assurance</h1>
+            </div>
+            <div class="http://localhost/dashboard/evolveqx/#home">
+                <div class="hero-description-box">
+                    <p class="hero-description" data-en="We are a software testing specialist company empowering enterprise organisations to achieve the highest standards of software quality. Combining deep industry expertise with a flexible on-site and nearshore delivery model, we connect businesses with the right talent, expertise, and approach to deliver reliable, scalable, and cost-effective quality solutions. Helping the best stay ahead of the rest." data-pt="Somos uma empresa especializada em testes de software que capacita organizações empresariais a alcançar os mais elevados padrões de qualidade de software. Combinando uma profunda experiência no setor com um modelo de entrega flexível, presencial e nearshore, ligamos as empresas às pessoas certas, ao conhecimento especializado e à abordagem adequada para fornecer soluções de qualidade fiáveis, escaláveis e economicamente eficientes. Ajudamos os melhores a manterem-se à frente dos restantes.">We are a software testing specialist company empowering enterprise organisations to achieve the highest standards of software quality. Combining deep industry expertise with a flexible on-site and nearshore delivery model, we connect businesses with the right talent, expertise, and approach to deliver reliable, scalable, and cost-effective quality solutions. Helping the best stay ahead of the rest.</p>
+                </div>
+            </div>
         </div>
-        <p class="hero-description" data-en="We are a software testing specialist company empowering enterprise organisations to achieve the highest standards of software quality. Combining deep industry expertise with a flexible on-site and nearshore delivery model, we connect businesses with the right talent, expertise, and approach to deliver reliable, scalable, and cost-effective quality solutions. Helping the best stay ahead of the rest." data-pt="Somos uma empresa especializada em testes de software que capacita organizações empresariais a alcançar os mais elevados padrões de qualidade de software. Combinando uma profunda experiência no setor com um modelo de entrega flexível, presencial e nearshore, ligamos as empresas às pessoas certas, ao conhecimento especializado e à abordagem adequada para fornecer soluções de qualidade fiáveis, escaláveis e economicamente eficientes. Ajudamos os melhores a manterem-se à frente dos restantes.">We are a software testing specialist company empowering enterprise organisations to achieve the highest standards of software quality. Combining deep industry expertise with a flexible on-site and nearshore delivery model, we connect businesses with the right talent, expertise, and approach to deliver reliable, scalable, and cost-effective quality solutions. Helping the best stay ahead of the rest.</p>
         <div class="hero-overlay-centered show-on-scroll" aria-hidden="false">
             <h2 class="hero-title">Evolve your quality experience with us!</h2>
         </div>
