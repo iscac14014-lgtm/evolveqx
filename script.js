@@ -11,6 +11,7 @@ const BIRD_CALL_VOLUME = 0.12;
 const BIRD_CALL_MAX_SECONDS = 6.0;
 const BIRD_CALL_FADE_SECONDS = 1.4;
 const BIRD_CALL_UNMUTE_DELAY_MS = 120;
+const BIRD_CALL_START_DELAY_MS = 3000;
 
 const App = (() => {
   const state = {
@@ -217,12 +218,14 @@ const App = (() => {
       }
     };
 
-    // Always keep one interaction-based attempt for autoplay-restricted browsers.
-    window.addEventListener("pointerdown", tryPlayOnInteraction, { passive: true });
-    window.addEventListener("keydown", tryPlayOnInteraction);
-    window.addEventListener("touchstart", tryPlayOnInteraction, { passive: true });
+    window.setTimeout(() => {
+      // Keep interaction-based attempts for autoplay-restricted browsers after the initial delay.
+      window.addEventListener("pointerdown", tryPlayOnInteraction, { passive: true });
+      window.addEventListener("keydown", tryPlayOnInteraction);
+      window.addEventListener("touchstart", tryPlayOnInteraction, { passive: true });
 
-    tryPlay(false);
+      tryPlay(false);
+    }, BIRD_CALL_START_DELAY_MS);
   };
 
   const initLucide = () => {
