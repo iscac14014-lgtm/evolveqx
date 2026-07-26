@@ -5,14 +5,12 @@ const HERO_IMAGES = [
   "assets/images/house4.jpg"
 ];
 
+const AIRBNB_LISTING_BASE_URL = "https://www.airbnb.pt/rooms/1161668466079419067";
+
 const App = (() => {
   const state = {
     heroIndex: 0,
-    heroInterval: null,
-    calendarDate: new Date(),
-    checkIn: null,
-    checkOut: null,
-    renderCalendar: null
+    heroInterval: null
   };
 
   const els = {
@@ -31,16 +29,11 @@ const App = (() => {
     lightbox: document.getElementById("lightbox"),
     lightboxImg: document.querySelector(".lightbox img"),
     lightboxClose: document.querySelector(".lightbox-close"),
-    calendarMonth: document.getElementById("calendar-month"),
-    calendarDays: document.getElementById("calendar-days"),
-    prevMonth: document.getElementById("prev-month"),
-    nextMonth: document.getElementById("next-month"),
-    arrivalDate: document.getElementById("arrival-date"),
-    departureDate: document.getElementById("departure-date"),
-    bookingForm: document.getElementById("booking-form"),
-    bookingFeedback: document.getElementById("booking-feedback"),
-    reservationModal: document.getElementById("reservation-modal"),
-    closeModal: document.getElementById("close-modal"),
+    airbnbBookingForm: document.getElementById("airbnb-booking-form"),
+    airbnbCheckin: document.getElementById("airbnb-checkin"),
+    airbnbCheckout: document.getElementById("airbnb-checkout"),
+    airbnbAdults: document.getElementById("airbnb-adults"),
+    airbnbFeedback: document.getElementById("airbnb-feedback"),
     contactForm: document.getElementById("contact-form"),
     contactFeedback: document.getElementById("contact-feedback")
   };
@@ -53,8 +46,7 @@ const App = (() => {
     initScrollAnimations();
     initLazyLoading();
     initGalleryLightbox();
-    initCalendar();
-    initBookingForm();
+    initAirbnbBooking();
     initContactForm();
     initScrollTop();
     initGlobalKeyboardShortcuts();
@@ -244,150 +236,52 @@ const App = (() => {
     });
   };
 
-  const initCalendar = () => {
-    const isSameDay = (d1, d2) =>
-      d1 && d2 && d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+  const initAirbnbBooking = () => {
+    if (!els.airbnbBookingForm) {
+      return;
+    }
 
-    const normalizeDate = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const today = normalizeDate(new Date());
+    const today = new Date().toISOString().split("T")[0];
+    els.airbnbCheckin.min = today;
+    els.airbnbCheckout.min = today;
 
-    const formatDate = date =>
-      new Intl.DateTimeFormat("pt-PT", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      }).format(date);
+    els.airbnbCheckin.addEventListener("change", () => {
+      const checkin = els.airbnbCheckin.value;
+      els.airbnbCheckout.min = checkin || today;
 
-    const renderCalendar = () => {
-      const year = state.calendarDate.getFullYear();
-      const month = state.calendarDate.getMonth();
-
-      const monthLabel = new Intl.DateTimeFormat("pt-PT", {
-        month: "long",
-        year: "numeric"
-      }).format(new Date(year, month, 1));
-
-      els.calendarMonth.textContent = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
-      els.calendarDays.innerHTML = "";
-
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-
-      const dayOffset = (firstDay.getDay() + 6) % 7;
-      const totalDays = lastDay.getDate();
-
-      for (let i = 0; i < dayOffset; i += 1) {
-        const empty = document.createElement("span");
-        empty.className = "empty-day";
-        els.calendarDays.appendChild(empty);
-      }
-
-      for (let day = 1; day <= totalDays; day += 1) {
-        const date = new Date(year, month, day);
-        const dayButton = document.createElement("button");
-        dayButton.type = "button";
-        dayButton.className = "day";
-        dayButton.textContent = String(day);
-        dayButton.setAttribute("role", "gridcell");
-        dayButton.setAttribute("aria-label", formatDate(date));
-
-        const isPast = normalizeDate(date) < today;
-        if (isPast) {
-          dayButton.classList.add("disabled");
-          dayButton.disabled = true;
-        }
-
-        const inRange = state.checkIn && state.checkOut && date > state.checkIn && date < state.checkOut;
-        if (inRange) {
-          dayButton.classList.add("in-range");
-        }
-
-        if (isSameDay(date, state.checkIn) || isSameDay(date, state.checkOut)) {
-          dayButton.classList.add("selected");
-          dayButton.classList.add("range-edge");
-        }
-
-        dayButton.addEventListener("click", () => selectDate(date));
-        els.calendarDays.appendChild(dayButton);
-      }
-    };
-
-    const selectDate = date => {
-      if (!state.checkIn || (state.checkIn && state.checkOut)) {
-        state.checkIn = date;
-        state.checkOut = null;
-      } else if (date < state.checkIn) {
-        state.checkOut = state.checkIn;
-        state.checkIn = date;
-      } else if (isSameDay(date, state.checkIn)) {
-        state.checkOut = null;
-      } else {
-        state.checkOut = date;
-      }
-
-      els.arrivalDate.value = state.checkIn ? formatDate(state.checkIn) : "";
-      els.departureDate.value = state.checkOut ? formatDate(state.checkOut) : "";
-      renderCalendar();
-    };
-
-    els.prevMonth.addEventListener("click", () => {
-      state.calendarDate.setMonth(state.calendarDate.getMonth() - 1);
-      renderCalendar();
-    });
-
-    els.nextMonth.addEventListener("click", () => {
-      state.calendarDate.setMonth(state.calendarDate.getMonth() + 1);
-      renderCalendar();
-    });
-
-    state.renderCalendar = renderCalendar;
-    renderCalendar();
-  };
-
-  const initBookingForm = () => {
-    const openModal = () => {
-      els.reservationModal.classList.add("open");
-      els.reservationModal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    };
-
-    const closeModal = () => {
-      els.reservationModal.classList.remove("open");
-      els.reservationModal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    };
-
-    els.closeModal.addEventListener("click", closeModal);
-    els.reservationModal.addEventListener("click", event => {
-      if (event.target === els.reservationModal) {
-        closeModal();
+      if (els.airbnbCheckout.value && checkin && els.airbnbCheckout.value <= checkin) {
+        els.airbnbCheckout.value = "";
       }
     });
 
-    els.bookingForm.addEventListener("submit", event => {
+    els.airbnbBookingForm.addEventListener("submit", event => {
       event.preventDefault();
-      const guests = els.bookingForm.guests.value;
 
-      if (!state.checkIn || !state.checkOut) {
-        els.bookingFeedback.textContent = "Selecione data de chegada e partida para continuar.";
+      const checkIn = els.airbnbCheckin.value;
+      const checkOut = els.airbnbCheckout.value;
+      const adults = els.airbnbAdults.value || "1";
+
+      if (!checkIn || !checkOut) {
+        els.airbnbFeedback.textContent = "Selecione check-in e check-out para continuar.";
         return;
       }
 
-      if (!guests) {
-        els.bookingFeedback.textContent = "Selecione o numero de hospedes.";
+      if (checkOut <= checkIn) {
+        els.airbnbFeedback.textContent = "A data de check-out deve ser posterior ao check-in.";
         return;
       }
 
-      els.bookingFeedback.textContent = "";
-      openModal();
-      els.bookingForm.reset();
-      state.checkIn = null;
-      state.checkOut = null;
-      els.arrivalDate.value = "";
-      els.departureDate.value = "";
-      if (typeof state.renderCalendar === "function") {
-        state.renderCalendar();
-      }
+      const airbnbUrl = new URL(AIRBNB_LISTING_BASE_URL);
+      airbnbUrl.searchParams.set("search_mode", "regular_search");
+      airbnbUrl.searchParams.set("adults", adults);
+      airbnbUrl.searchParams.set("check_in", checkIn);
+      airbnbUrl.searchParams.set("check_out", checkOut);
+      airbnbUrl.searchParams.set("children", "0");
+      airbnbUrl.searchParams.set("infants", "0");
+      airbnbUrl.searchParams.set("pets", "0");
+
+      els.airbnbFeedback.textContent = "A abrir disponibilidade no Airbnb...";
+      window.open(airbnbUrl.toString(), "_blank", "noopener,noreferrer");
     });
   };
 
@@ -435,8 +329,6 @@ const App = (() => {
       if (event.key === "Escape") {
         els.lightbox.classList.remove("open");
         els.lightbox.setAttribute("aria-hidden", "true");
-        els.reservationModal.classList.remove("open");
-        els.reservationModal.setAttribute("aria-hidden", "true");
         document.body.style.overflow = "";
       }
     });

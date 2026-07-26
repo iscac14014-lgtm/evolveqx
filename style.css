@@ -496,103 +496,44 @@ a {
 }
 
 .reservation .section-title,
-.reservation p,
-.reservation label {
+.reservation p {
   color: var(--white);
 }
 
-.reservation-grid {
-  display: grid;
-  gap: 1.3rem;
-  grid-template-columns: 1.2fr 0.8fr;
-}
-
-.calendar-card,
-.booking-panel {
+.booking-embed-card {
   background: rgba(255, 255, 255, 0.12);
   border-radius: var(--radius);
   border: 1px solid rgba(255, 255, 255, 0.24);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(9px);
+  padding: 1rem;
 }
 
-.calendar-card {
-  padding: 1.1rem;
+.airbnb-reservation-form {
+  margin-top: 1rem;
 }
 
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.9rem;
-}
-
-.calendar-header button {
-  border: none;
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--white);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.calendar-weekdays,
-.calendar-days {
+.airbnb-form-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.42rem;
+  gap: 0.8rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.calendar-weekdays span {
-  text-align: center;
-  font-size: 0.87rem;
-  opacity: 0.88;
-}
-
-.calendar-days {
-  margin-top: 0.7rem;
-}
-
-.day {
-  border: none;
-  border-radius: 10px;
-  min-height: 42px;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--white);
-  cursor: pointer;
-  transition: background-color var(--transition), transform var(--transition);
-}
-
-.day:hover:not(.disabled) {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-}
-
-.day.disabled {
-  opacity: 0.28;
-  cursor: not-allowed;
-}
-
-.day.selected,
-.day.range-edge {
-  background: var(--accent);
-  color: #2b2009;
-}
-
-.day.in-range {
-  background: rgba(217, 164, 65, 0.38);
-  color: #fff7e5;
-}
-
-.booking-panel {
-  padding: 1.1rem;
-}
-
-.booking-panel form {
+.booking-embed-actions {
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.booking-embed-actions .btn {
+  width: 100%;
+}
+
+.booking-note {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.93rem;
 }
 
 label {
@@ -761,8 +702,7 @@ a:focus-visible {
   transform: translateY(0);
 }
 
-.lightbox,
-.modal {
+.lightbox {
   position: fixed;
   inset: 0;
   background: rgba(10, 18, 15, 0.82);
@@ -774,8 +714,7 @@ a:focus-visible {
   transition: opacity var(--transition), visibility var(--transition);
 }
 
-.lightbox.open,
-.modal.open {
+.lightbox.open {
   opacity: 1;
   visibility: visible;
 }
@@ -800,19 +739,6 @@ a:focus-visible {
   font-size: 1.8rem;
   line-height: 1;
   cursor: pointer;
-}
-
-.modal-content {
-  width: min(460px, 90vw);
-  background: #fff;
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: var(--shadow-strong);
-}
-
-.modal-content p {
-  margin-bottom: 1.2rem;
 }
 
 .animate-on-scroll {
@@ -848,7 +774,6 @@ a:focus-visible {
   }
 
   .split-layout,
-  .reservation-grid,
   .contact-grid {
     grid-template-columns: 1fr;
   }
@@ -897,6 +822,10 @@ a:focus-visible {
 
   .masonry-gallery {
     columns: 2 160px;
+  }
+
+  .airbnb-form-grid {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -212,45 +212,53 @@
 
       <section class="section reservation" id="reservas">
         <div class="container">
-          <h2 class="section-title animate-on-scroll fade-up">Reserve a sua estadia</h2>
+          <h2 class="section-title animate-on-scroll fade-up">Reservas no Airbnb</h2>
+          <p class="section-subtitle animate-on-scroll fade-up">
+            Consulte disponibilidade e finalize a sua reserva com segurança diretamente no Airbnb.
+          </p>
 
-          <div class="reservation-grid">
-            <article class="calendar-card animate-on-scroll slide-left" aria-label="Calendario de reservas">
-              <header class="calendar-header">
-                <button id="prev-month" aria-label="Mês anterior">&#10094;</button>
-                <h3 id="calendar-month" aria-live="polite"></h3>
-                <button id="next-month" aria-label="Mês seguinte">&#10095;</button>
-              </header>
-              <div class="calendar-weekdays" aria-hidden="true">
-                <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sab</span><span>Dom</span>
+          <article class="booking-embed-card animate-on-scroll fade-up" aria-label="Reservas Airbnb">
+            <p class="booking-note">
+              O Airbnb não permite mostrar a página de reserva em iframe. Selecione as datas abaixo para abrir
+              diretamente a casa no Airbnb com os dados preenchidos.
+            </p>
+
+            <form id="airbnb-booking-form" class="airbnb-reservation-form" novalidate>
+              <div class="airbnb-form-grid">
+                <div>
+                  <label for="airbnb-checkin">Check-in</label>
+                  <input type="date" id="airbnb-checkin" name="checkin" required />
+                </div>
+                <div>
+                  <label for="airbnb-checkout">Check-out</label>
+                  <input type="date" id="airbnb-checkout" name="checkout" required />
+                </div>
+                <div>
+                  <label for="airbnb-adults">Adultos</label>
+                  <select id="airbnb-adults" name="adults" required>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                  </select>
+                </div>
               </div>
-              <div id="calendar-days" class="calendar-days" role="grid" aria-label="Dias do mes"></div>
-            </article>
 
-            <aside class="booking-panel animate-on-scroll slide-right">
-              <form id="booking-form" novalidate>
-                <label for="arrival-date">Data de chegada</label>
-                <input type="text" id="arrival-date" name="arrival" placeholder="Selecionar data" readonly />
-
-                <label for="departure-date">Data de partida</label>
-                <input type="text" id="departure-date" name="departure" placeholder="Selecionar data" readonly />
-
-                <label for="guests">Número de hóspedes</label>
-                <select id="guests" name="guests" required>
-                  <option value="">Selecionar</option>
-                  <option value="1">1 hóspede</option>
-                  <option value="2">2 hóspedes</option>
-                  <option value="3">3 hóspedes</option>
-                  <option value="4">4 hóspedes</option>
-                  <option value="5">5 hóspedes</option>
-                  <option value="6">6 hóspedes</option>
-                </select>
-
-                <button type="submit" class="btn btn-primary full">Solicitar Reserva</button>
-                <p class="form-feedback" id="booking-feedback" aria-live="polite"></p>
-              </form>
-            </aside>
-          </div>
+              <div class="booking-embed-actions">
+                <button type="submit" class="btn btn-primary">Ver disponibilidade no Airbnb</button>
+                <a
+                  class="btn btn-secondary"
+                  href="https://www.airbnb.pt/rooms/1161668466079419067"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Abrir anúncio sem datas</a
+                >
+              </div>
+              <p class="form-feedback" id="airbnb-feedback" aria-live="polite"></p>
+            </form>
+          </article>
         </div>
       </section>
 
@@ -336,14 +344,6 @@
     <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="Visualizacao da imagem">
       <button class="lightbox-close" aria-label="Fechar imagem">&times;</button>
       <img src="" alt="Imagem ampliada da galeria" />
-    </div>
-
-    <div class="modal" id="reservation-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal-content">
-        <h3 id="modal-title">Pedido registado</h3>
-        <p>O seu pedido de reserva foi registado. Entraremos em contacto consigo em breve.</p>
-        <button id="close-modal" class="btn btn-primary">Fechar</button>
-      </div>
     </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
