@@ -226,10 +226,22 @@ const App = (() => {
       }
     };
 
+    const tryPlayOnScroll = async () => {
+      if (state.birdCallPlayed || window.scrollY <= 0) {
+        return;
+      }
+
+      const played = await tryPlay(true);
+      if (played) {
+        window.removeEventListener("scroll", tryPlayOnScroll);
+      }
+    };
+
     // Keep interaction-based attempts for autoplay-restricted browsers.
     window.addEventListener("pointerdown", tryPlayOnInteraction, { passive: true });
     window.addEventListener("keydown", tryPlayOnInteraction);
     window.addEventListener("touchstart", tryPlayOnInteraction, { passive: true });
+    window.addEventListener("scroll", tryPlayOnScroll, { passive: true });
 
     tryPlay(false);
   };
