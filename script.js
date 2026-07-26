@@ -11,7 +11,6 @@ const BIRD_CALL_VOLUME = 0.12;
 const BIRD_CALL_MAX_SECONDS = 6.0;
 const BIRD_CALL_FADE_SECONDS = 1.4;
 const BIRD_CALL_UNMUTE_DELAY_MS = 120;
-const BIRD_CALL_START_DELAY_MS = 3000;
 
 const App = (() => {
   const state = {
@@ -64,7 +63,8 @@ const App = (() => {
   const initBirdCall = () => {
     const audio = els.birdCallAudio || new Audio(BIRD_CALL_AUDIO_URL);
     audio.preload = "auto";
-    audio.volume = BIRD_CALL_VOLUME;
+    audio.volume = 0;
+    audio.muted = true;
     let fadeTimeoutId;
     let stopTimeoutId;
 
@@ -143,8 +143,8 @@ const App = (() => {
         stopTimeoutId = window.setTimeout(() => {
           audio.pause();
           audio.currentTime = 0;
-          audio.volume = BIRD_CALL_VOLUME;
-          audio.muted = false;
+          audio.volume = 0;
+          audio.muted = true;
         }, playbackMs);
       };
 
@@ -163,28 +163,36 @@ const App = (() => {
           });
         }
 
-        audio.currentTime = 0;
+        if (audio.paused) {
+          audio.currentTime = 0;
+          audio.muted = true;
+          audio.volume = 0;
+          await audio.play();
+        }
+
         audio.muted = false;
         audio.volume = BIRD_CALL_VOLUME;
-        await audio.play();
         scheduleFadeAndStop();
-
         state.birdCallPlayed = true;
+
         return true;
       } catch {
         try {
-          // Aggressive autoplay strategy: start muted (often allowed), then unmute.
           audio.currentTime = 0;
           audio.muted = true;
-          audio.volume = BIRD_CALL_VOLUME;
+          audio.volume = 0;
           await audio.play();
           window.setTimeout(() => {
+            if (state.birdCallPlayed) {
+              return;
+            }
+
             audio.muted = false;
             audio.volume = BIRD_CALL_VOLUME;
+            scheduleFadeAndStop();
+            state.birdCallPlayed = true;
           }, BIRD_CALL_UNMUTE_DELAY_MS);
-          scheduleFadeAndStop();
 
-          state.birdCallPlayed = true;
           return true;
         } catch {
           return false;
@@ -218,14 +226,12 @@ const App = (() => {
       }
     };
 
-    window.setTimeout(() => {
-      // Keep interaction-based attempts for autoplay-restricted browsers after the initial delay.
-      window.addEventListener("pointerdown", tryPlayOnInteraction, { passive: true });
-      window.addEventListener("keydown", tryPlayOnInteraction);
-      window.addEventListener("touchstart", tryPlayOnInteraction, { passive: true });
+    // Keep interaction-based attempts for autoplay-restricted browsers.
+    window.addEventListener("pointerdown", tryPlayOnInteraction, { passive: true });
+    window.addEventListener("keydown", tryPlayOnInteraction);
+    window.addEventListener("touchstart", tryPlayOnInteraction, { passive: true });
 
-      tryPlay(false);
-    }, BIRD_CALL_START_DELAY_MS);
+    tryPlay(false);
   };
 
   const initLucide = () => {
