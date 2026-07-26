@@ -702,6 +702,7 @@ a:focus-visible {
   transform: translateY(0);
 }
 
+
 .lightbox {
   position: fixed;
   inset: 0;
@@ -849,4 +850,5 @@ a:focus-visible {
   .hero-actions .btn {
     width: 100%;
   }
+
 }

@@ -6,11 +6,17 @@ const HERO_IMAGES = [
 ];
 
 const AIRBNB_LISTING_BASE_URL = "https://www.airbnb.pt/rooms/1161668466079419067";
+const BIRD_CALL_AUDIO_URL = "assets/audio/som.mp3";
+const BIRD_CALL_VOLUME = 0.18;
+const BIRD_CALL_MAX_SECONDS = 6.0;
+const BIRD_CALL_FADE_SECONDS = 1.4;
+const BIRD_CALL_UNMUTE_DELAY_MS = 120;
 
 const App = (() => {
   const state = {
     heroIndex: 0,
-    heroInterval: null
+    heroInterval: null,
+    birdCallPlayed: false
   };
 
   const els = {
@@ -29,6 +35,7 @@ const App = (() => {
     lightbox: document.getElementById("lightbox"),
     lightboxImg: document.querySelector(".lightbox img"),
     lightboxClose: document.querySelector(".lightbox-close"),
+    birdCallAudio: document.getElementById("bird-call-audio"),
     airbnbBookingForm: document.getElementById("airbnb-booking-form"),
     airbnbCheckin: document.getElementById("airbnb-checkin"),
     airbnbCheckout: document.getElementById("airbnb-checkout"),
@@ -40,6 +47,7 @@ const App = (() => {
 
   const init = () => {
     initLucide();
+    initBirdCall();
     initNavbar();
     initSmoothScroll();
     initHeroCarousel();
@@ -50,6 +58,171 @@ const App = (() => {
     initContactForm();
     initScrollTop();
     initGlobalKeyboardShortcuts();
+  };
+
+  const initBirdCall = () => {
+    const audio = els.birdCallAudio || new Audio(BIRD_CALL_AUDIO_URL);
+    audio.preload = "auto";
+    audio.volume = BIRD_CALL_VOLUME;
+    let fadeTimeoutId;
+    let stopTimeoutId;
+
+    audio.addEventListener("error", () => {
+      // Keep this log for quick diagnosis when the MP3 encoding is invalid.
+      console.warn("Falha ao carregar o ficheiro de audio:", BIRD_CALL_AUDIO_URL);
+    });
+
+    const playSyntheticFallback = async () => {
+      const AudioContextRef = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextRef) {
+        return false;
+      }
+
+      try {
+        const audioCtx = new AudioContextRef();
+        await audioCtx.resume();
+        const start = audioCtx.currentTime + 0.04;
+
+        const chirp = (offset, fromFreq, toFreq) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(fromFreq, start + offset);
+          osc.frequency.exponentialRampToValueAtTime(toFreq, start + offset + 0.14);
+
+          gain.gain.setValueAtTime(0.0001, start + offset);
+          gain.gain.exponentialRampToValueAtTime(0.02, start + offset + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + offset + 0.16);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(start + offset);
+          osc.stop(start + offset + 0.17);
+        };
+
+        chirp(0, 1700, 2350);
+        chirp(0.2, 1600, 2200);
+        state.birdCallPlayed = true;
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    const playAudioFile = async () => {
+      if (state.birdCallPlayed) {
+        return true;
+      }
+
+      const scheduleFadeAndStop = () => {
+        window.clearTimeout(fadeTimeoutId);
+        window.clearTimeout(stopTimeoutId);
+
+        const playbackMs = BIRD_CALL_MAX_SECONDS * 1000;
+        const fadeMs = Math.min(BIRD_CALL_FADE_SECONDS, BIRD_CALL_MAX_SECONDS) * 1000;
+        const fadeStartMs = Math.max(0, playbackMs - fadeMs);
+
+        fadeTimeoutId = window.setTimeout(() => {
+          const steps = 16;
+          const stepMs = Math.max(35, Math.floor(fadeMs / steps));
+          let step = 0;
+
+          const fadeInterval = window.setInterval(() => {
+            step += 1;
+            const progress = Math.min(step / steps, 1);
+            audio.volume = Math.max(0, BIRD_CALL_VOLUME * (1 - progress));
+
+            if (progress >= 1) {
+              window.clearInterval(fadeInterval);
+            }
+          }, stepMs);
+        }, fadeStartMs);
+
+        stopTimeoutId = window.setTimeout(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = BIRD_CALL_VOLUME;
+          audio.muted = false;
+        }, playbackMs);
+      };
+
+      try {
+        if (audio.readyState < 2) {
+          await new Promise(resolve => {
+            const done = () => {
+              audio.removeEventListener("canplay", done);
+              audio.removeEventListener("loadeddata", done);
+              resolve();
+            };
+
+            audio.addEventListener("canplay", done, { once: true });
+            audio.addEventListener("loadeddata", done, { once: true });
+            window.setTimeout(done, 500);
+          });
+        }
+
+        audio.currentTime = 0;
+        audio.muted = false;
+        audio.volume = BIRD_CALL_VOLUME;
+        await audio.play();
+        scheduleFadeAndStop();
+
+        state.birdCallPlayed = true;
+        return true;
+      } catch {
+        try {
+          // Aggressive autoplay strategy: start muted (often allowed), then unmute.
+          audio.currentTime = 0;
+          audio.muted = true;
+          audio.volume = BIRD_CALL_VOLUME;
+          await audio.play();
+          window.setTimeout(() => {
+            audio.muted = false;
+            audio.volume = BIRD_CALL_VOLUME;
+          }, BIRD_CALL_UNMUTE_DELAY_MS);
+          scheduleFadeAndStop();
+
+          state.birdCallPlayed = true;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    };
+
+    const cleanupFirstInteractionListeners = () => {
+      window.removeEventListener("pointerdown", tryPlayOnInteraction);
+      window.removeEventListener("keydown", tryPlayOnInteraction);
+      window.removeEventListener("touchstart", tryPlayOnInteraction);
+    };
+
+    const tryPlay = async allowFallback => {
+      const audioPlayed = await playAudioFile();
+      if (audioPlayed) {
+        return true;
+      }
+
+      if (!allowFallback) {
+        return false;
+      }
+
+      return playSyntheticFallback();
+    };
+
+    const tryPlayOnInteraction = async () => {
+      const played = await tryPlay(true);
+      if (played) {
+        cleanupFirstInteractionListeners();
+      }
+    };
+
+    // Always keep one interaction-based attempt for autoplay-restricted browsers.
+    window.addEventListener("pointerdown", tryPlayOnInteraction, { passive: true });
+    window.addEventListener("keydown", tryPlayOnInteraction);
+    window.addEventListener("touchstart", tryPlayOnInteraction, { passive: true });
+
+    tryPlay(false);
   };
 
   const initLucide = () => {
