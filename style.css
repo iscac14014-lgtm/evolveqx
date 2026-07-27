@@ -678,12 +678,14 @@ a:focus-visible {
   display: grid;
   place-items: center;
   line-height: 0;
+  color: #d6e0dc;
   background: rgba(255, 255, 255, 0.1);
   transition: transform var(--transition), background-color var(--transition);
 }
 
 .social-links a:hover {
   transform: translateY(-2px);
+  color: #ffffff;
   background: rgba(255, 255, 255, 0.2);
 }
 
