@@ -683,10 +683,20 @@ a:focus-visible {
   transition: transform var(--transition), background-color var(--transition);
 }
 
+.site-footer .social-links a,
+.site-footer .social-links a:visited {
+  color: #d6e0dc !important;
+}
+
 .social-links a:hover {
   transform: translateY(-2px);
   color: #ffffff;
   background: rgba(255, 255, 255, 0.2);
+}
+
+.site-footer .social-links a:hover,
+.site-footer .social-links a:focus-visible {
+  color: #ffffff !important;
 }
 
 .social-links i {
@@ -709,10 +719,19 @@ a:focus-visible {
   stroke: none;
 }
 
+.site-footer .social-links .social-icon--facebook path {
+  fill: currentColor !important;
+}
+
 .social-links .social-icon--instagram {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.site-footer .social-links .social-icon--instagram rect,
+.site-footer .social-links .social-icon--instagram circle {
+  stroke: currentColor !important;
 }
 
 .social-links .social-email-icon {
