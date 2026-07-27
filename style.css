@@ -677,6 +677,7 @@ a:focus-visible {
   border-radius: 50%;
   display: grid;
   place-items: center;
+  line-height: 0;
   background: rgba(255, 255, 255, 0.1);
   transition: transform var(--transition), background-color var(--transition);
 }
@@ -689,6 +690,32 @@ a:focus-visible {
 .social-links i {
   width: 16px;
   height: 16px;
+}
+
+.social-links .social-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2;
+  transform: translateZ(0);
+}
+
+.social-links .social-icon--facebook {
+  fill: currentColor;
+  stroke: none;
+}
+
+.social-links .social-icon--instagram {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.social-links .social-email-icon {
+  width: 15px;
+  height: 15px;
 }
 
 #scroll-top {
